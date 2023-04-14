@@ -73,7 +73,7 @@ void loop() {
 
     if (Recebido == '+') {
 
-      if (TempoEnvase < 60000) {
+      if (TempoEnvase < 30000) {
         TempoEnvase = (TempoEnvase + 1000);
       }
       Serial.print("Tempo Envase: ");
@@ -175,10 +175,11 @@ void loop() {
 
   if (TempoEnvaseSalvo != TempoEnvase) {
     TempoEnvaseSalvo = TempoEnvase;
-    EEPROM.write(0, (TempoEnvaseSalvo / 1000));
-    Serial.print("Novo Tempo de Envase Salvo: ");
+    EEPROM.write(0, TempoEnvaseSalvo / 1000);
+    Serial.print("Tempo de envase salvo: ");
     Serial.print(TempoEnvaseSalvo / 1000);
     Serial.print("s \t");
+    Serial.print("EEPROM: ");
     Serial.print(EEPROM.read(0));
     Serial.println("s");
   }
