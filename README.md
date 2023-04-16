@@ -1,4 +1,4 @@
-# Envasamento
+# Esteira Envasadora
 
 Este é um código em linguagem de programação Arduino que controla um sistema de envase automático. O código usa um sensor ultrassônico para medir a distância de um recipiente que se move em uma esteira, e um conjunto de botões e sensores para controlar a operação do sistema. Quando o recipiente está na posição correta, o sistema enche o recipiente com um líquido e em seguida, a esteira avança para a próxima posição.
 
