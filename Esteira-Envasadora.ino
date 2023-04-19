@@ -79,15 +79,15 @@ void loop() {
   currentTime = millis();
   // Quando o sistema estiver em manual será mostrado a distância lida pelo sensor hcsr04 a cada 2s.
   if (!Est_Automatico && distancia < 999 && (currentTime - startTime >= period)) {
-    Serial.print("Distancia ");  // Imprime o texto no monitor serial
+    Serial.print("Distância ");  // Imprime o texto no monitor serial
     Serial.print(distancia);     // Imprime a distância medida no monitor serial
     Serial.println("cm");        // Imprime o texto no monitor serial
     startTime = currentTime;
   }
 
   // lê o estado do botão automático ou manual: manual (HIGH) ou automático (LOW).
-  if (Est_Automatico != digitalRead(Btn_AutoMan)) {
-    Est_Automatico = digitalRead(Btn_AutoMan);                                                       // O estado do botão automático/manual é armazena na variável Est_Automatico.
+  if (Est_Automatico == digitalRead(Btn_AutoMan)) {
+    Est_Automatico = !digitalRead(Btn_AutoMan);                                                      // O estado do botão automático/manual é armazena na variável Est_Automatico.
     Est_Automatico ? Serial.println("Sistema em automático") : Serial.println("Sistema em manual");  // Imprime o texto no monitor serial.
   }
 
@@ -133,7 +133,7 @@ void StartEsteira() {
     }
   } else {
     // Verifica se botão avança esteira esta precionado
-    if (digitalRead(Btn_EsteiraAvanca)) {
+    if (!digitalRead(Btn_EsteiraAvanca)) {
       // Liga esteira em manual
       digitalWrite(Esteira, LIGA);
     } else {
