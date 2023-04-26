@@ -10,10 +10,10 @@
 
 const int Btn_AutoMan = 2;        // Pino digital utilizado pelo botão automático = 1, Manual = 0.
 const int Btn_EsteiraAvanca = 3;  // Pino digital utilizado pelo botão avança esteira.
-const int echoPin = 7;            // Pino digital utilizado pelo HC-SR04 ECHO(RECEBE).
-const int trigPin = 8;            // Pino digital utilizado pelo HC-SR04 TRIG(ENVIA).
-const int Rele_Bomba = 10;        // Pino digital utilizado pelo rele da bomba.
-const int Rele_Esteira = 11;      // Pino digital utilizado pelo rele da Esteira.
+const int echoPin = 4;            // Pino digital utilizado pelo HC-SR04 ECHO(RECEBE).
+const int trigPin = 5;            // Pino digital utilizado pelo HC-SR04 TRIG(ENVIA).
+const int Rele_Esteira = 6;       // Pino digital utilizado pelo rele da Esteira.
+const int Rele_Bomba = 7;         // Pino digital utilizado pelo rele da bomba.
 const int LED_Manual = 12;        // Pino digital utilizado pelo LED_Manual para sinalizar sistema em manual.
 const int LED_Automatico = 13;    // Pino digital utilizado pelo LED_Automatico para sinalizar sistema em automático.
 
