@@ -2,7 +2,7 @@
 * Programa : Esteira Envasadora
 * Autor : Eliton Roberto Monteiro
 * Data: 01/04/2023
-* Versão: 1.2v
+* Versão: 1.3v
 */
 
 #include <EEPROM.h>      // incluir a biblioteca EEPROM.
@@ -13,7 +13,7 @@ const int Btn_EsteiraAvanca = 3;  // Pino digital utilizado pelo botão avança 
 const int echoPin = 4;            // Pino digital utilizado pelo HC-SR04 ECHO(RECEBE).
 const int trigPin = 5;            // Pino digital utilizado pelo HC-SR04 TRIG(ENVIA).
 const int Rele_Esteira = 6;       // Pino digital utilizado pelo rele da Esteira.
-const int Rele_Bomba = 7;         // Pino digital utilizado pelo rele da bomba.
+const int Rele_Bomba = 7;         // Pino digital utilizado pelo rele da Bomba.
 const int LED_Manual = 12;        // Pino digital utilizado pelo LED_Manual para sinalizar sistema em manual.
 const int LED_Automatico = 13;    // Pino digital utilizado pelo LED_Automatico para sinalizar sistema em automático.
 
@@ -39,23 +39,24 @@ boolean BombaEstado = false;
 
 
 void setup() {
-  Serial.begin(9600);                          // Inicia comunicação serial.
-  Serial.println("\n\n\nIniciando Setup...");  // Imprime o texto no monitor serial.
-  pinMode(Rele_Bomba, OUTPUT);                 // define o pino do rele liga bomba como saída do Arduíno.
-  pinMode(LED_Automatico, OUTPUT);             // define o pino do LED_Automatico saída do Arduíno.
-  pinMode(LED_Manual, OUTPUT);                 // define o pino do LED_Manual saída do Arduíno.
-  pinMode(Rele_Esteira, OUTPUT);               // define o pino do rele liga esteira como saída do Arduíno.
-  pinMode(Btn_AutoMan, INPUT_PULLUP);          // define pino do botão automático como entrada do Arduíno.
-  pinMode(Btn_EsteiraAvanca, INPUT_PULLUP);    // define pino do botão avança esteira como entrada do Arduíno.
-  pinMode(echoPin, INPUT);                     // define pino como entrada do HC-SR04.
-  pinMode(trigPin, OUTPUT);                    // define pino como saída do HC-SR04.
-  digitalWrite(Rele_Esteira, DESLIGA);         // Inicia esteira desligada.
-  digitalWrite(Rele_Bomba, DESLIGA);           // Inicia bomba desligada.
-  TempoEnvaseSalvo = (EEPROM.read(0) * 1000);  // Recupera valor do tempo salvo do envase.
-  TempoEnvase = TempoEnvaseSalvo;              // Configura valor do tempo de envase que foi salvo na EEPROM.
-  // Função if para garantir tempo mínimo de 5s do envase.
-  if (TempoEnvase < 5000) {
-    TempoEnvase = 5000;
+  Serial.begin(9600);                                     // Inicia comunicação serial.
+  Serial.println(F(__FILE__ " " __DATE__ " " __TIME__));  // Só para saber qual programa está rodando no meu Arduino
+  Serial.println("\n\n\nIniciando Setup...");             // Imprime o texto no monitor serial.
+  pinMode(Rele_Bomba, OUTPUT);                            // define o pino do rele liga bomba como saída do Arduíno.
+  pinMode(LED_Automatico, OUTPUT);                        // define o pino do LED_Automatico saída do Arduíno.
+  pinMode(LED_Manual, OUTPUT);                            // define o pino do LED_Manual saída do Arduíno.
+  pinMode(Rele_Esteira, OUTPUT);                          // define o pino do rele liga esteira como saída do Arduíno.
+  pinMode(Btn_AutoMan, INPUT_PULLUP);                     // define pino do botão automático como entrada do Arduíno.
+  pinMode(Btn_EsteiraAvanca, INPUT_PULLUP);               // define pino do botão avança esteira como entrada do Arduíno.
+  pinMode(echoPin, INPUT);                                // define pino como entrada do HC-SR04.
+  pinMode(trigPin, OUTPUT);                               // define pino como saída do HC-SR04.
+  digitalWrite(Rele_Esteira, DESLIGA);                    // Inicia esteira desligada.
+  digitalWrite(Rele_Bomba, DESLIGA);                      // Inicia bomba desligada.
+  TempoEnvaseSalvo = (EEPROM.read(0) * 1000);             // Recupera valor do tempo salvo do envase.
+  TempoEnvase = TempoEnvaseSalvo;                         // Configura valor do tempo de envase que foi salvo na EEPROM.
+  // Função if para garantir tempo mínimo de 1s do envase.
+  if (TempoEnvase < 1000) {
+    TempoEnvase = 1000;
   }
   Serial.print("Tempo de envase configurado para: ");  // Imprime o texto no monitor serial.
   Serial.print(TempoEnvase / 1000);                    // Imprime o texto no monitor serial.
@@ -66,14 +67,12 @@ void setup() {
 
 void loop() {
 
-  hcsr04();  // Faz a chamada do método "hcsr04()"
-
-  // Aqui definimos a posição do recipiente, nesse caso deve ser menor que 10cm.
-  if (distancia <= 10) {
-    RecipientePosicionado = true;  // Recipiente posicionado de maneira correta.
-  } else {
-    RecipientePosicionado = false;  // Recipiente não está na posição esperada.
-  }
+  hcsr04();                                                                              // Função usada para verificar posição do recipiente.
+  StartEsteira();                                                                        // Função de controle da esteira.
+  StartEnvase();                                                                         // Função de controle da bomba de envase.
+  ComunicacaoBluetooth();                                                                // Função de controle da comunicação Bluetooth.
+  SalvaTempoEnvase();                                                                    // Função de controle do tempo de envase que é salvo na EEPROM.
+  Est_Automatico ? digitalWrite(LED_Automatico, HIGH) : digitalWrite(LED_Manual, HIGH);  // controle dos LEDs para indicar estado automático ou manual.
 
   currentTime = millis();
   // Quando o sistema estiver em manual será mostrado no monitor serial a distância lida pelo sensor hcsr04 a cada 2s.
@@ -89,13 +88,6 @@ void loop() {
     Est_Automatico = !digitalRead(Btn_AutoMan);                                                          // O estado do botão automático/manual é armazena na variável Est_Automatico de forma invertida.
     Est_Automatico ? Serial.println("\nSistema em automático") : Serial.println("\nSistema em manual");  // Imprime o texto no monitor serial.
   }
-
-  StartEsteira();                                // Função de controle da esteira.
-  StartEnvase();                                 // Função de controle da bomba de envase.
-  ComunicacaoBluetooth();                        // Função de controle da comunicação Bluetooth.
-  SalvaTempoEnvase();                            // Função de controle do tempo de envase que é salvo na EEPROM.
-  digitalWrite(LED_Automatico, Est_Automatico);  // controle do LED para indicar estado automático.
-  digitalWrite(LED_Manual, !Est_Automatico);     // controle do LED para indicar estado manual.
 }
 
 // Função responsável por calcular a distância
@@ -112,6 +104,13 @@ void hcsr04() {
   }
   result = String(distancia);  // variável global do tipo string recebe a distância(convertido de inteiro para string)
   delay(10);                   // intervalo de 10 milissegundos
+
+  // Aqui definimos a posição do recipiente, nesse caso deve ser menor que 7cm.
+  if (distancia <= 7) {
+    RecipientePosicionado = true;  // Recipiente posicionado de maneira correta.
+  } else {
+    RecipientePosicionado = false;  // Recipiente não está na posição esperada.
+  }
 }
 
 // Função responsável pelo funcionamento da esteira.
@@ -133,6 +132,8 @@ void StartEsteira() {
 
     } else {
       digitalWrite(Rele_Esteira, DESLIGA);  // Desliga esteira em automático.
+      delay(1000);                          // Aguarda 1s para confirmar esteira parada.
+      hcsr04();                             // Função usada para verificar posição do recipiente.
     }
   } else {
     // Verifica se botão avança esteira esta precionado.
@@ -160,7 +161,6 @@ void StartEnvase() {
       Serial.print("Envasamento iniciado tempo: ");  // Imprime o texto no monitor serial.
       Serial.print(TempoEnvase / 1000);              // Imprime o texto no monitor serial.
       Serial.println("s");                           // Imprime o texto no monitor serial.
-      delay(1000);                                   // Aguarda 1s para iniciar envase.
       digitalWrite(Rele_Bomba, LIGA);                // Liga bomba de envase.
       delay(TempoEnvase);                            // Aguarda tempo de envase
       digitalWrite(Rele_Bomba, DESLIGA);             // Desliga bomba de envase.
@@ -211,7 +211,7 @@ void ComunicacaoBluetooth() {
     // Decrementa valor do tempo de envase.
     if (Recebido == '-') {
 
-      if (TempoEnvase > 5000) {
+      if (TempoEnvase > 1000) {
         TempoEnvase = TempoEnvase - 1000;  // Decrementa 1 segundo no valor do tempo de envase.
       }
       Serial.print("Tempo envase: ");    // Imprime o texto no monitor serial.
