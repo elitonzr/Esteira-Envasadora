@@ -7,3 +7,7 @@ O código usa a biblioteca "EEPROM" para salvar o tempo de envase configurado pe
 Existem algumas variáveis configuradas no início do código, incluindo os pinos usados para cada botão, sensor e atuador, bem como o tempo de envase padrão e um contador de quantos recipientes foram enchidos. O código verifica se o usuário salvou um tempo de envase anteriormente e usa esse valor, ou define o valor padrão de 10 segundos.
 
 O código usa um loop para executar continuamente o processo de enchimento dos recipientes, verificando se um recipiente está presente no local correto usando um sensor de posição e medindo a distância do recipiente usando o sensor ultrassônico. Se um recipiente estiver presente, o sistema começa a encher o recipiente com um líquido e depois verifica se o recipiente está cheio. Se o recipiente estiver cheio, o sistema para de encher o recipiente e a esteira avança para a próxima posição. O código também verifica a entrada serial e atualiza o tempo de envase ou o contador de recipientes cheios, conforme necessário. O código usa o LED para indicar o status do sistema.
+
+## Esquema de ligação
+
+![😁️](Imagens/Esteira-Envasadora.png)
