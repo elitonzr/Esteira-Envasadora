@@ -67,12 +67,26 @@ void setup() {
 
 void loop() {
 
-  hcsr04();                                                                              // Função usada para verificar posição do recipiente.
-  StartEsteira();                                                                        // Função de controle da esteira.
-  StartEnvase();                                                                         // Função de controle da bomba de envase.
-  ComunicacaoBluetooth();                                                                // Função de controle da comunicação Bluetooth.
-  SalvaTempoEnvase();                                                                    // Função de controle do tempo de envase que é salvo na EEPROM.
-  Est_Automatico ? digitalWrite(LED_Automatico, HIGH) : digitalWrite(LED_Manual, HIGH);  // controle dos LEDs para indicar estado automático ou manual.
+  // Lê o estado do botão automático ou manual: manual (HIGH) ou automático (LOW), e armazena o estado invertido na variável Est_Automatico.
+  if (Est_Automatico == digitalRead(Btn_AutoMan)) {
+    Est_Automatico = !digitalRead(Btn_AutoMan);                                                          // O estado do botão automático/manual é armazena na variável Est_Automatico de forma invertida.
+    Est_Automatico ? Serial.println("\nSistema em automático") : Serial.println("\nSistema em manual");  // Imprime o texto no monitor serial.
+  }
+
+  // Controle dos LEDs para indicar estado automático ou manual.
+  if (Est_Automatico) {
+    digitalWrite(LED_Automatico, HIGH);  // Liga LED que indicar estado automático.
+    digitalWrite(LED_Manual, LOW);       // Desliga LED que indicar estado manual.
+  } else {
+    digitalWrite(LED_Automatico, LOW);  // desliga LED que indicar estado automático.
+    digitalWrite(LED_Manual, HIGH);     // Liga LED que indicar estado manual.
+  }
+
+  hcsr04();                // Função usada para verificar posição do recipiente.
+  StartEsteira();          // Função de controle da esteira.
+  StartEnvase();           // Função de controle da bomba de envase.
+  ComunicacaoBluetooth();  // Função de controle da comunicação Bluetooth.
+  SalvaTempoEnvase();      // Função de controle do tempo de envase que é salvo na EEPROM.
 
   currentTime = millis();
   // Quando o sistema estiver em manual será mostrado no monitor serial a distância lida pelo sensor hcsr04 a cada 2s.
@@ -81,12 +95,6 @@ void loop() {
     Serial.print(distancia);     // Imprime a distância medida no monitor serial
     Serial.println("cm");        // Imprime o texto no monitor serial
     startTime = currentTime;
-  }
-
-  // lê o estado do botão automático ou manual: manual (HIGH) ou automático (LOW), e armazena o estado invertido na variável Est_Automatico.
-  if (Est_Automatico == digitalRead(Btn_AutoMan)) {
-    Est_Automatico = !digitalRead(Btn_AutoMan);                                                          // O estado do botão automático/manual é armazena na variável Est_Automatico de forma invertida.
-    Est_Automatico ? Serial.println("\nSistema em automático") : Serial.println("\nSistema em manual");  // Imprime o texto no monitor serial.
   }
 }
 
