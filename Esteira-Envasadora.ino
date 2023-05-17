@@ -14,8 +14,8 @@ const int echoPin = 4;            // Pino digital utilizado pelo HC-SR04 ECHO(RE
 const int trigPin = 5;            // Pino digital utilizado pelo HC-SR04 TRIG(ENVIA).
 const int Rele_Esteira = 6;       // Pino digital utilizado pelo rele da Esteira.
 const int Rele_Bomba = 7;         // Pino digital utilizado pelo rele da Bomba.
-const int LED_Manual = 12;        // Pino digital utilizado pelo LED_Manual para sinalizar sistema em manual.
-const int LED_Automatico = 13;    // Pino digital utilizado pelo LED_Automatico para sinalizar sistema em automático.
+const int LED_RGB_Verde = 12;        // Pino digital utilizado pelo LED RGB cor verde para sinalizar sistema em manual.
+const int LED_RGB_Vermelho = 13;    // Pino digital utilizado pelo LED RGB cor vermelha para sinalizar sistema em automático.
 
 Ultrasonic ultrasonic(trigPin, echoPin);  //Iniciando os pinos do HC-SR04.
 
@@ -39,21 +39,21 @@ boolean BombaEstado = false;
 
 
 void setup() {
-  Serial.begin(9600);                                     // Inicia comunicação serial.
-  Serial.println(F(__FILE__ " " __DATE__ " " __TIME__));  // Só para saber qual programa está rodando no meu Arduino
-  Serial.println("\n\n\nIniciando Setup...");             // Imprime o texto no monitor serial.
-  pinMode(Rele_Bomba, OUTPUT);                            // define o pino do rele liga bomba como saída do Arduíno.
-  pinMode(LED_Automatico, OUTPUT);                        // define o pino do LED_Automatico saída do Arduíno.
-  pinMode(LED_Manual, OUTPUT);                            // define o pino do LED_Manual saída do Arduíno.
-  pinMode(Rele_Esteira, OUTPUT);                          // define o pino do rele liga esteira como saída do Arduíno.
-  pinMode(Btn_AutoMan, INPUT_PULLUP);                     // define pino do botão automático como entrada do Arduíno.
-  pinMode(Btn_EsteiraAvanca, INPUT_PULLUP);               // define pino do botão avança esteira como entrada do Arduíno.
-  pinMode(echoPin, INPUT);                                // define pino como entrada do HC-SR04.
-  pinMode(trigPin, OUTPUT);                               // define pino como saída do HC-SR04.
-  digitalWrite(Rele_Esteira, DESLIGA);                    // Inicia esteira desligada.
-  digitalWrite(Rele_Bomba, DESLIGA);                      // Inicia bomba desligada.
-  TempoEnvaseSalvo = (EEPROM.read(0) * 1000);             // Recupera valor do tempo salvo do envase.
-  TempoEnvase = TempoEnvaseSalvo;                         // Configura valor do tempo de envase que foi salvo na EEPROM.
+  Serial.begin(9600);                                                                  // Inicia comunicação serial.
+  Serial.print(F("Sketch:   " __FILE__ "\nCompiled: " __DATE__ " " __TIME__ "\n\n"));  // Só para saber qual programa está rodando no meu Arduino.
+  Serial.println("\n\n\nIniciando Setup...");                                          // Imprime o texto no monitor serial.
+  pinMode(Rele_Bomba, OUTPUT);                                                         // define o pino do rele liga bomba como saída do Arduíno.
+  pinMode(LED_RGB_Vermelho, OUTPUT);                                                     // define o pino do LED RGB cor verde saída do Arduíno.
+  pinMode(LED_RGB_Verde, OUTPUT);                                                         // define o pino do LED RGB cor vermelha saída do Arduíno.
+  pinMode(Rele_Esteira, OUTPUT);                                                       // define o pino do rele liga esteira como saída do Arduíno.
+  pinMode(Btn_AutoMan, INPUT_PULLUP);                                                  // define pino do botão automático como entrada do Arduíno.
+  pinMode(Btn_EsteiraAvanca, INPUT_PULLUP);                                            // define pino do botão avança esteira como entrada do Arduíno.
+  pinMode(echoPin, INPUT);                                                             // define pino como entrada do HC-SR04.
+  pinMode(trigPin, OUTPUT);                                                            // define pino como saída do HC-SR04.
+  digitalWrite(Rele_Esteira, DESLIGA);                                                 // Inicia esteira desligada.
+  digitalWrite(Rele_Bomba, DESLIGA);                                                   // Inicia bomba desligada.
+  TempoEnvaseSalvo = (EEPROM.read(0) * 1000);                                          // Recupera valor do tempo salvo do envase.
+  TempoEnvase = TempoEnvaseSalvo;                                                      // Configura valor do tempo de envase que foi salvo na EEPROM.
   // Função if para garantir tempo mínimo de 1s do envase.
   if (TempoEnvase < 1000) {
     TempoEnvase = 1000;
@@ -75,11 +75,11 @@ void loop() {
 
   // Controle dos LEDs para indicar estado automático ou manual.
   if (Est_Automatico) {
-    digitalWrite(LED_Automatico, HIGH);  // Liga LED que indicar estado automático.
-    digitalWrite(LED_Manual, LOW);       // Desliga LED que indicar estado manual.
+    digitalWrite(LED_RGB_Vermelho, HIGH);  // Liga LED RGB cor vermelha que indicar estado automático.
+    digitalWrite(LED_RGB_Verde, LOW);       // Desliga LED RGB cor verde que indicar estado manual.
   } else {
-    digitalWrite(LED_Automatico, LOW);  // desliga LED que indicar estado automático.
-    digitalWrite(LED_Manual, HIGH);     // Liga LED que indicar estado manual.
+    digitalWrite(LED_RGB_Vermelho, LOW);  // desliga LED RGB cor vermelha que indicar estado automático.
+    digitalWrite(LED_RGB_Verde, HIGH);     // Liga LED RGB cor verde que indicar estado manual.
   }
 
   hcsr04();                // Função usada para verificar posição do recipiente.
